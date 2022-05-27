@@ -1,28 +1,29 @@
 " Copyright (c) 2014 Alex Yatskov <alex@foosoft.net>
 "
-" Permission is hereby granted, free of charge, to any person obtaining a copy of
-" this software and associated documentation files (the "Software"), to deal in
-" the Software without restriction, including without limitation the rights to
-" use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-" the Software, and to permit persons to whom the Software is furnished to do so,
-" subject to the following conditions:
-"
-" The above copyright notice and this permission notice shall be included in all
-" copies or substantial portions of the Software.
-"
-" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-" FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-" COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-" IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-" CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    " Permission is hereby granted, free of charge, to any person obtaining a copy of
+    " this software and associated documentation files (the "Software"), to deal in
+    " the Software without restriction, including without limitation the rights to
+    " use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+    " the Software, and to permit persons to whom the Software is furnished to do so,
+    " subject to the following conditions:
+    "
+    " The above copyright notice and this permission notice shall be included in all
+    " copies or substantial portions of the Software.
+    "
+    " THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    " IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    " FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+    " COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    " IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    " CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-function! argwrap#validateRange(range)
+
+fun! argwrap#validateRange(range)
     return len(a:range) > 0 && !(a:range.lineStart == 0 && a:range.colStart == 0 || a:range.lineEnd == 0 && a:range.colEnd == 0)
-endfunction
+endf
 
-function! argwrap#compareRanges(range1, range2)
+fun! argwrap#compareRanges(range1, range2)
     let [l:buffer, l:line, l:col, l:offset] = getpos('.')
 
     let l:lineDiff1 = a:range1.lineStart - l:line
@@ -38,35 +39,35 @@ function! argwrap#compareRanges(range1, range2)
         return 1
     elseif l:colDiff1 > l:colDiff2
         return -1
-    else
+    el
         return 0
-    endif
-endfunction
+    en
+endf
 
-function! argwrap#findRange(braces)
+fun! argwrap#findRange(braces)
     let l:filter = 'synIDattr(synID(line("."), col("."), 0), "name") =~? "string"'
     let [l:lineStart, l:colStart] = searchpairpos(a:braces[0], '', a:braces[1], 'Wnb', filter)
     let [l:lineEnd, l:colEnd] = searchpairpos(a:braces[0], '', a:braces[1], 'Wcn', filter)
     return {'lineStart': l:lineStart, 'colStart': l:colStart, 'lineEnd': l:lineEnd, 'colEnd': l:colEnd}
-endfunction
+endf
 
-function! argwrap#findClosestRange()
+fun! argwrap#findClosestRange()
     let l:ranges = []
     for l:braces in [['(', ')'], ['\[', '\]'], ['{', '}']]
         let l:range = argwrap#findRange(braces)
         if argwrap#validateRange(l:range)
             call add(l:ranges, l:range)
-        endif
+        en
     endfor
 
     if len(l:ranges) == 0
         return {}
-    else
+    el
         return sort(l:ranges, 'argwrap#compareRanges')[0]
-    endif
-endfunction
+    en
+endf
 
-function! argwrap#extractContainerArgText(range, linePrefix)
+fun! argwrap#extractContainerArgText(range, linePrefix)
     let l:text = ''
     let l:trimPattern = printf('\m^\s*\(.\{-}\%%(%s\)\?\)\s*$', escape(a:linePrefix, '\$.*^['))
 
@@ -76,28 +77,28 @@ function! argwrap#extractContainerArgText(range, linePrefix)
         let l:extractStart = 0
         if l:lineIndex == a:range.lineStart
             let l:extractStart = a:range.colStart
-        endif
+        en
 
         let l:extractEnd = strlen(l:lineText)
         if l:lineIndex == a:range.lineEnd
             let l:extractEnd = a:range.colEnd - 1
-        endif
+        en
 
         if l:extractStart < l:extractEnd
             let l:extract = l:lineText[l:extractStart : l:extractEnd - 1]
             let l:extract = substitute(l:extract, l:trimPattern, '\1', '')
             if stridx(l:extract, a:linePrefix) == 0
                 let l:extract = l:extract[len(a:linePrefix):]
-            endif
+            en
             let l:extract = substitute(l:extract, ',$', ', ', '')
             let l:text .= l:extract
-        endif
+        en
     endfor
 
     return l:text
-endfunction
+endf
 
-function! argwrap#updateScope(stack, char)
+fun! argwrap#updateScope(stack, char)
     let l:pairs = {'"': '"', '''': '''', ')': '(', ']': '[', '}': '{'}
     let l:length = len(a:stack)
 
@@ -105,16 +106,16 @@ function! argwrap#updateScope(stack, char)
         call remove(a:stack, l:length - 1)
     elseif index(values(l:pairs), a:char) >= 0
         call add(a:stack, a:char)
-    endif
-endfunction
+    en
+endf
 
-function! argwrap#trimArgument(text)
+fun! argwrap#trimArgument(text)
     let l:trim = substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
     let l:trim = substitute(l:trim, '\([:=]\)\s\{2,}', '\1 ', '')
     return substitute(l:trim, '\s\{2,}\([:=]\)', ' \1', '')
-endfunction
+endf
 
-function! argwrap#extractContainerArgs(text)
+fun! argwrap#extractContainerArgs(text)
     let l:text = substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
 
     let l:stack = []
@@ -130,23 +131,23 @@ function! argwrap#extractContainerArgs(text)
                 let l:argument = argwrap#trimArgument(l:argument)
                 if len(l:argument) > 0
                     call add(l:arguments, l:argument)
-                endif
+                en
                 let l:argument = ''
-            else
+            el
                 let l:argument .= l:char
-            endif
+            en
         endfor
 
         let l:argument = argwrap#trimArgument(l:argument)
         if len(l:argument) > 0
             call add(l:arguments, l:argument)
-        endif
-    endif
+        en
+    en
 
     return l:arguments
-endfunction
+endf
 
-function! argwrap#extractContainer(range)
+fun! argwrap#extractContainer(range)
     let l:textStart = getline(a:range.lineStart)
     let l:textEnd = getline(a:range.lineEnd)
 
@@ -155,12 +156,23 @@ function! argwrap#extractContainer(range)
     let l:suffix = l:textEnd[a:range.colEnd - 1:]
 
     return {'indent': l:indent, 'prefix': l:prefix, 'suffix': l:suffix}
-endfunction
+endf
 
-function! argwrap#wrapContainer(range, container, arguments, wrapBrace, tailComma, tailCommaBraces, tailIndentBraces, linePrefix, commaFirst, commaFirstIndent)
-    let l:argCount = len(a:arguments)
-    let l:line = a:range.lineStart
-    let l:prefix = a:container.prefix[len(a:container.prefix) - 1]
+fun! argwrap#wrapContainer(
+                            \ range,
+                            \ container,
+                            \ arguments,
+                            \ wrapBrace,
+                            \ tailComma,
+                            \ tailCommaBraces,
+                            \ tailIndentBraces,
+                            \ linePrefix,
+                            \ commaFirst,
+                            \ commaFirstIndent,
+                            \ )
+    let l:argCount =  len(a:arguments)
+    let l:line     =  a:range.lineStart
+    let l:prefix   =  a:container.prefix[len(a:container.prefix) - 1]
 
     call setline(l:line, a:container.indent . a:container.prefix)
 
@@ -175,94 +187,243 @@ function! argwrap#wrapContainer(range, container, arguments, wrapBrace, tailComm
                 let l:text .= ', '
             end
             let l:text .= a:arguments[l:index]
-        else
-            let l:text .= a:container.indent . a:linePrefix . a:arguments[l:index]
+        el
+            let l:text .= a:container.indent .. a:linePrefix .. a:arguments[l:index]
             if  !l:last || a:tailComma || a:tailCommaBraces =~ l:prefix
                 let l:text .= ','
-            end
-        end
+            en
+        en
 
         if l:last && !a:wrapBrace
             let l:text .= a:container.suffix
-        end
+        en
 
         call append(l:line, l:text)
-        let l:line += 1
-        silent! exec printf('%s>', l:line)
+
+        " 处理indent
+            " https://github.com/FooSoft/vim-argwrap/pull/26/files
+            " 为了对齐得更好看:
+            " 这2行:
+                " let l:line += 1
+                " silent! exec printf('%s>', l:line)
+            " 变成 (开始):
+                if !a:linePrefix
+                    if l:first
+                        norm! Jx
+                            " 第一个arg此前已被换行, 现在取消换行
+                        let l:indent = repeat(" ", getcurpos()[2] - 1)
+
+                        " " 处理python里的self被conceal的情况:
+                        " 不好搞:
+                        " if getline(l:line) =~ 'self\.'
+                        "     let l:indent = repeat(" ", getcurpos()[2] - 1 - 4)
+                        " en
+                    else
+                        let l:line += 1
+                        call setline(
+                                    \ l:line,
+                                    \ substitute(
+                                                \ getline(l:line),
+                                                \ "^ *",
+                                                \ l:indent,
+                                                \ "",
+                                                \ ),
+                                    \ )
+
+
+                        " " 处理python里的self被conceal的情况:
+                        " 不好搞:
+                        " if getline(l:line) =~ 'self\.'
+                        "     let l:indent = repeat(" ", getcurpos()[2] - 1 - 4)
+                        " en
+
+                    endif
+                else  " 死板地indent一次
+                    let l:line += 1
+                    silent! exec printf('%s>', l:line)
+                                    " 行号>>
+                                    " Example
+                                        " 233>>
+                                        " 666>>
+                endif
+
+            " 变成 (有bug的尝试):
+                " if a:wrapBrace
+                " " if !a:wrapBrace
+                "     " 如果Brace wrapping disabled:
+                "     "     Foo(
+                "     "         wibble,
+                "     "         wobble,
+                "     "         wubble)
+                "     if l:first
+                "         " norm! Jx
+                "             " 第一个arg此前已被换行, 现在取消换行
+                "         let l:indent = repeat(" ", getcurpos()[2] - 1)
+                "         if a:linePrefix
+                "         "     echom '删掉prefix'
+                "             norm! x
+                "         en
+                "     else
+                "         let l:line += 1
+                "         call setline(
+                "                     \ l:line,
+                "                     \ substitute(
+                "                                 \ getline(l:line),
+                "                                 \ "^ *",
+                "                                 \ l:indent,
+                "                                 \ "",
+                "                                 \ ),
+                "                     \ )
+                "     endif
+                " else
+                "     let l:line += 1
+                "     silent! exec printf('%s>', l:line)
+                "                     " 行号>>
+                "                     " Example
+                "                         " 233>>
+                "                         " 666>>
+                " endif
+
+            " 变成 (结束)
+
+
 
         if l:first && a:commaFirstIndent
             let width = &l:shiftwidth
             let &l:shiftwidth = 2
             silent! exec printf('%s>', l:line)
             let &l:shiftwidth = l:width
-        end
+        en
     endfor
 
-    if a:wrapBrace
-        call append(l:line, a:container.indent . a:linePrefix . a:container.suffix)
-        if a:tailIndentBraces =~ l:prefix
-            silent! exec printf('%s>', l:line + 1)
-        end
-    endif
-endfunction
 
-function! argwrap#unwrapContainer(range, container, arguments, padded)
+
+
+    if a:wrapBrace
+        call append(  l:line,
+                    \ a:container.indent . a:linePrefix . a:container.suffix,
+                    \ )
+        if a:tailIndentBraces =~ l:prefix
+            " tailIndentBraces作用:
+                    "  enabled:
+                    "     Foo(
+                    "         wibble,
+                    "         wobble,
+                    "         wubble
+                    "         ¿)¿
+
+                    " disabled:
+                    "     Foo(
+                    "         wibble,
+                    "         wobble,
+                    "         wubble
+                        " )
+
+            let l:indent = repeat(" ", getcurpos()[2] - 2)
+            let l:line += 1
+            call setline(
+                        \ l:line,
+                        \ substitute(
+                                    \ getline(l:line),
+                                    \ "^ *",
+                                    \ l:indent,
+                                    \ "",
+                                    \ ),
+                        \ )
+
+            " silent! exec printf('%s>', l:line + 1)
+        en
+
+        "
+    en
+endf
+
+fun! argwrap#unwrapContainer(range, container, arguments, padded)
     let l:brace = a:container.prefix[strlen(a:container.prefix) - 1]
     if stridx(a:padded, l:brace) == -1
         let l:padding = ''
-    else
+    el
         let l:padding = ' '
-    endif
+    en
 
     let l:text = a:container.indent . a:container.prefix . l:padding . join(a:arguments, ', ') . l:padding . a:container.suffix
     call setline(a:range.lineStart, l:text)
     exec printf('silent %d,%dd_', a:range.lineStart + 1, a:range.lineEnd)
-endfunction
+endf
 
-function! argwrap#getSetting(name)
-    let l:bName = 'b:argwrap_' . a:name
-    let l:gName = 'g:argwrap_' . a:name
 
-    return exists(l:bName) ? {l:bName} : {l:gName}
-endfunction
+" setting
+    fun! argwrap#getSetting(name)
+        let l:bName = 'b:argwrap_' . a:name
+        let l:gName = 'g:argwrap_' . a:name
 
-function! argwrap#initSetting(name, value) abort
-    let l:setting = 'g:argwrap_'.a:name
+        return exists(l:bName) ? {l:bName} : {l:gName}
+    endf
 
-    if !exists(l:setting)
-        let {l:setting} = a:value
-    endif
-endfunction
+    fun! argwrap#initSetting(name, value) abort
+        let l:setting = 'g:argwrap_'.a:name
 
-function! argwrap#toggle()
-    let l:linePrefix = argwrap#getSetting('line_prefix')
-    let l:padded = argwrap#getSetting('padded_braces')
-    let l:tailComma = argwrap#getSetting('tail_comma')
-    let l:tailCommaBraces = argwrap#getSetting('tail_comma_braces')
-    let l:tailIndentBraces = argwrap#getSetting('tail_indent_braces')
-    let l:wrapBrace = argwrap#getSetting('wrap_closing_brace')
-    let l:commaFirst = argwrap#getSetting('comma_first')
-    let l:commaFirstIndent = argwrap#getSetting('comma_first_indent')
+        if !exists(l:setting)
+            let {l:setting} = a:value
+        en
+    endf
+
+fun! argwrap#toggle()
+    let l:linePrefix       =  argwrap#getSetting('line_prefix')
+    let l:padded           =  argwrap#getSetting('padded_braces')
+    let l:tailComma        =  argwrap#getSetting('tail_comma')
+    let l:tailCommaBraces  =  argwrap#getSetting('tail_comma_braces')
+    let l:tailIndentBraces =  argwrap#getSetting('tail_indent_braces')
+    let l:wrapBrace        =  argwrap#getSetting('wrap_closing_brace')
+    let l:commaFirst       =  argwrap#getSetting('comma_first')
+    let l:commaFirstIndent =  argwrap#getSetting('comma_first_indent')
 
     let l:range = argwrap#findClosestRange()
     if !argwrap#validateRange(l:range)
         return
-    endif
+    en
 
-    let l:argText = argwrap#extractContainerArgText(l:range, l:linePrefix)
-    let l:arguments = argwrap#extractContainerArgs(l:argText)
+    let l:argText   =  argwrap#extractContainerArgText(l:range, l:linePrefix)
+    let l:arguments =  argwrap#extractContainerArgs(l:argText)
     if len(l:arguments) == 0
         return
-    endif
+    en
 
     let l:container = argwrap#extractContainer(l:range)
+    " 一行变多行
     if l:range.lineStart == l:range.lineEnd
-        call argwrap#hooks#execute('pre_wrap', l:range, l:container, l:arguments)
-        call argwrap#wrapContainer(l:range, l:container, l:arguments, l:wrapBrace, l:tailComma, l:tailCommaBraces, l:tailIndentBraces, l:linePrefix, l:commaFirst, l:commaFirstIndent)
-        call argwrap#hooks#execute('post_wrap', l:range, l:container, l:arguments)
-    else
+        call argwrap#hooks#execute(
+                                    \ 'pre_wrap',
+                                    \ l:range,
+                                    \ l:container,
+                                    \ l:arguments,
+                                    \ )
+        call argwrap#wrapContainer(
+                                  \ l:range,
+                                  \ l:container,
+                                  \ l:arguments,
+                                  \ l:wrapBrace,
+                                  \ l:tailComma,
+                                  \ l:tailCommaBraces,
+                                  \ l:tailIndentBraces,
+                                  \ l:linePrefix,
+                                  \ l:commaFirst,
+                                  \ l:commaFirstIndent,
+                                  \ )
+        call argwrap#hooks#execute(
+                                    \ 'post_wrap',
+                                    \ l:range,
+                                    \ l:container,
+                                    \ l:arguments,
+                                    \ )
+    el  " 多变1
         call argwrap#hooks#execute('pre_unwrap', l:range, l:container, l:arguments)
-        call argwrap#unwrapContainer(l:range, l:container, l:arguments, l:padded)
+        call argwrap#unwrapContainer(
+                                    \ l:range,
+                                    \ l:container,
+                                    \ l:arguments,
+                                    \ l:padded,
+                                    \ )
         call argwrap#hooks#execute('post_unwrap', l:range, l:container, l:arguments)
-    endif
-endfunction
+    en
+endf
