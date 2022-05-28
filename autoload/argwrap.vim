@@ -370,6 +370,8 @@ endf
 
 fun! argwrap#toggle()
     let l:linePrefix       =  argwrap#getSetting('line_prefix')
+    echom l:linePrefix
+    echom 'l:linePrefix'
     let l:padded           =  argwrap#getSetting('padded_braces')
     let l:tailComma        =  argwrap#getSetting('tail_comma')
     let l:tailCommaBraces  =  argwrap#getSetting('tail_comma_braces')
