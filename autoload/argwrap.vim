@@ -24,11 +24,11 @@ fun! argwrap#validateRange(range)
 endf
 
 fun! argwrap#compareRanges(range1, range2)
-    let [l:buffer, l:line, l:col, l:offset] = getpos('.')
+    let [l:buffer, line_nuM, l:col, l:offset] = getpos('.')
 
-    let l:lineDiff1 = a:range1.lineStart - l:line
+    let l:lineDiff1 = a:range1.lineStart - line_nuM
     let l:colDiff1 = a:range1.colStart - l:col
-    let l:lineDiff2 = a:range2.lineStart - l:line
+    let l:lineDiff2 = a:range2.lineStart - line_nuM
     let l:colDiff2 = a:range2.colStart - l:col
 
     if l:lineDiff1 < l:lineDiff2
@@ -68,6 +68,8 @@ fun! argwrap#findClosestRange()
 endf
 
 fun! argwrap#extractContainerArgText(range, linePrefix)
+    " echom "71 行 linePrefix是" a:linePrefix
+    " vim里面是¿\¿
     let l:text = ''
     let l:trimPattern = printf('\m^\s*\(.\{-}\%%(%s\)\?\)\s*$', escape(a:linePrefix, '\$.*^['))
 
@@ -171,10 +173,10 @@ fun! argwrap#wrapContainer(
                             \ commaFirstIndent,
                             \ )
     let l:argCount =  len(a:arguments)
-    let l:line     =  a:range.lineStart
+    let line_nuM     =  a:range.lineStart
     let l:prefix   =  a:container.prefix[len(a:container.prefix) - 1]
 
-    call setline(l:line, a:container.indent . a:container.prefix)
+    call setline(line_nuM, a:container.indent . a:container.prefix)
 
     for l:index in range(l:argCount)
         let l:last = l:index == l:argCount - 1
@@ -189,8 +191,17 @@ fun! argwrap#wrapContainer(
             let l:text .= a:arguments[l:index]
         el
             let l:text .= a:container.indent .. a:linePrefix .. a:arguments[l:index]
-            if  !l:last || a:tailComma || a:tailCommaBraces =~ l:prefix
-                let l:text .= ','
+            " echom "a:arguments 是: "   a:arguments
+            " echom "l:index 是: "   l:index
+            " echom "a:arguments[l:index] 是: "   a:arguments[l:index]
+            " echom "l:text 是: "   l:text
+
+            if  !l:last
+                    let l:text .= ','
+            el
+                if  a:tailComma    ||   a:tailCommaBraces =~ l:prefix
+                    let l:text .= ','
+                en
             en
         en
 
@@ -198,16 +209,25 @@ fun! argwrap#wrapContainer(
             let l:text .= a:container.suffix
         en
 
-        call append(l:line, l:text)
+        call append(line_nuM, l:text)
 
         " 处理indent
             " https://github.com/FooSoft/vim-argwrap/pull/26/files
             " 为了对齐得更好看:
             " 这2行:
-                " let l:line += 1
-                " silent! exec printf('%s>', l:line)
+                " let line_nuM += 1
+                " silent! exec printf('%s>', line_nuM)
             " 变成 (开始):
-                if !a:linePrefix
+                if a:linePrefix != ''
+                " 因为有'/'等prefix, 如果arg1没换行, 就报错
+                    " 下一行 死板地indent一次:
+                    let line_nuM += 1
+                    silent! exec printf('%s>', line_nuM)
+                                    " 行号>>
+                                    " Example
+                                        " 233>>
+                                        " 666>>
+                else
                     if l:first
                         norm! Jx
                             " 第一个arg此前已被换行, 现在取消换行
@@ -215,15 +235,15 @@ fun! argwrap#wrapContainer(
 
                         " " 处理python里的self被conceal的情况:
                         " 不好搞:
-                        " if getline(l:line) =~ 'self\.'
+                        " if getline(line_nuM) =~ 'self\.'
                         "     let l:indent = repeat(" ", getcurpos()[2] - 1 - 4)
                         " en
                     else
-                        let l:line += 1
+                        let line_nuM += 1
                         call setline(
-                                    \ l:line,
+                                    \ line_nuM,
                                     \ substitute(
-                                                \ getline(l:line),
+                                                \ getline(line_nuM),
                                                 \ "^ *",
                                                 \ l:indent,
                                                 \ "",
@@ -233,18 +253,11 @@ fun! argwrap#wrapContainer(
 
                         " " 处理python里的self被conceal的情况:
                         " 不好搞:
-                        " if getline(l:line) =~ 'self\.'
+                        " if getline(line_nuM) =~ 'self\.'
                         "     let l:indent = repeat(" ", getcurpos()[2] - 1 - 4)
                         " en
 
                     endif
-                else  " 死板地indent一次
-                    let l:line += 1
-                    silent! exec printf('%s>', l:line)
-                                    " 行号>>
-                                    " Example
-                                        " 233>>
-                                        " 666>>
                 endif
 
             " 变成 (有bug的尝试):
@@ -264,11 +277,11 @@ fun! argwrap#wrapContainer(
                 "             norm! x
                 "         en
                 "     else
-                "         let l:line += 1
+                "         let line_nuM += 1
                 "         call setline(
-                "                     \ l:line,
+                "                     \ line_nuM,
                 "                     \ substitute(
-                "                                 \ getline(l:line),
+                "                                 \ getline(line_nuM),
                 "                                 \ "^ *",
                 "                                 \ l:indent,
                 "                                 \ "",
@@ -276,8 +289,8 @@ fun! argwrap#wrapContainer(
                 "                     \ )
                 "     endif
                 " else
-                "     let l:line += 1
-                "     silent! exec printf('%s>', l:line)
+                "     let line_nuM += 1
+                "     silent! exec printf('%s>', line_nuM)
                 "                     " 行号>>
                 "                     " Example
                 "                         " 233>>
@@ -291,7 +304,7 @@ fun! argwrap#wrapContainer(
         if l:first && a:commaFirstIndent
             let width = &l:shiftwidth
             let &l:shiftwidth = 2
-            silent! exec printf('%s>', l:line)
+            silent! exec printf('%s>', line_nuM)
             let &l:shiftwidth = l:width
         en
     endfor
@@ -300,7 +313,7 @@ fun! argwrap#wrapContainer(
 
 
     if a:wrapBrace
-        call append(  l:line,
+        call append(  line_nuM,
                     \ a:container.indent . a:linePrefix . a:container.suffix,
                     \ )
         if a:tailIndentBraces =~ l:prefix
@@ -320,18 +333,18 @@ fun! argwrap#wrapContainer(
                         " )
 
             let l:indent = repeat(" ", getcurpos()[2] - 2)
-            let l:line += 1
+            let line_nuM += 1
             call setline(
-                        \ l:line,
+                        \ line_nuM,
                         \ substitute(
-                                    \ getline(l:line),
+                                    \ getline(line_nuM),
                                     \ "^ *",
                                     \ l:indent,
                                     \ "",
                                     \ ),
                         \ )
 
-            " silent! exec printf('%s>', l:line + 1)
+            " silent! exec printf('%s>', line_nuM + 1)
         en
 
         "
