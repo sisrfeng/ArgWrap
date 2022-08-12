@@ -15,7 +15,7 @@ fun! s:extractCursorPositionForUnwrappedArguments(range, arguments) abort " {{{
 
         if l:argumentEnd < l:cursorColumn
             if l:lineText[l:cursorColumn - 1:] =~ '\v^,' " Cursor on the separator
-                if !argwrap#getSetting('comma_first')
+                if !wrapA#getCfg('comma_first')
                     let l:cursorColumn = l:argumentEnd + 1
                 el
                     let l:position.argumentNumber = l:argumentNumber + 1
@@ -48,7 +48,7 @@ endf " }}}
 
 fun! s:extractCursorPositionForWrappedArguments(range, arguments) abort " {{{
     let l:position = {}
-    let l:isCommaFirst = argwrap#getSetting('comma_first')
+    let l:isCommaFirst = wrapA#getCfg('comma_first')
     let l:cursorColumn = col('.')
     let l:cursorArgumentNumber = line('.') - a:range.lineStart
     " In case the cursor is on the start line
@@ -125,21 +125,21 @@ fun! s:setCursorPosition(position) abort " {{{
     call setpos('.', l:curpos)
 endf  " }}}
 
-fun! argwrap#hooks#000_curpos#pre_wrap(range, container, arguments) abort " {{{
+fun! wrapA#hooks#000_curpos#pre_wrap(range, container, arguments) abort " {{{
     let a:container.cursor = s:extractCursorPositionForUnwrappedArguments(a:range, a:arguments)
 endf  " }}}
 
-fun! argwrap#hooks#000_curpos#pre_unwrap(range, container, arguments) abort " {{{
+fun! wrapA#hooks#000_curpos#pre_unwrap(range, container, arguments) abort " {{{
     let a:container.cursor = s:extractCursorPositionForWrappedArguments(a:range, a:arguments)
 endf  " }}}
 
-fun! argwrap#hooks#000_curpos#post_wrap(range, container, arguments) abort " {{{
+fun! wrapA#hooks#000_curpos#post_wrap(range, container, arguments) abort " {{{
     let l:position = s:getCursorPositionForWrappedArguments(a:range, a:container, a:arguments)
 
     call s:setCursorPosition(l:position)
 endf  " }}}
 
-fun! argwrap#hooks#000_curpos#post_unwrap(range, container, arguments) abort " {{{
+fun! wrapA#hooks#000_curpos#post_unwrap(range, container, arguments) abort " {{{
     let l:position = s:getCursorPositionForUnwrappedArguments(a:range, a:container, a:arguments)
 
     call s:setCursorPosition(l:position)

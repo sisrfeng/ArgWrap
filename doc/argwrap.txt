@@ -1,34 +1,34 @@
-argwrap.txt
+wrapA.txt
 
 Wrap and unwrap function arguments, lists, and dictionaries in Vim
 
 ========================================================================================================================
-CONTENTS  *argwrap-contents*
+CONTENTS  *wrapA-contents*
 
-1. ArgWrap.........................................|argwrap-argwrap|
-    1.1. Installation.........................|argwrap-installation|
-    1.2. Configuration.......................|argwrap-configuration|
-    1.3. Hooks.......................................|argwrap-hooks|
-    1.4. Usage.......................................|argwrap-usage|
-    1.5. License...................................|argwrap-license|
+1. wrapA.........................................|wrapA-wrapA|
+    1.1. Installation.........................|wrapA-installation|
+    1.2. Configuration.......................|wrapA-configuration|
+    1.3. Hooks.......................................|wrapA-hooks|
+    1.4. Usage.......................................|wrapA-usage|
+    1.5. License...................................|wrapA-license|
 
 ========================================================================================================================
-ARGWRAP                                                                                                  *argwrap-argwrap*
+wrapA                                                                                                  *wrapA-wrapA*
 
 An industrial strength argument wrapping
 
 
 
 ------------------------------------------------------------------------------------------------------------------------
-INSTALLATION                                                                                        *argwrap-installation*
+INSTALLATION                                                                                        *wrapA-installation*
 
     For example, to declare a normal mode mapping, add the following command:
 
-        nmap <silent> <leader>a <Plug>(ArgWrapToggle)
+        nmap <silent> <leader>a <Plug>(wrapAToggle)
 
 
 ------------------------------------------------------------------------------------------------------------------------
-CONFIGURATION                                                                                      *argwrap-configuration*
+CONFIGURATION                                                                                      *wrapA-configuration*
 
 You can customize the behavior of this extension by
 setting values for any of the following optional buffer and
@@ -39,11 +39,11 @@ take precedence over global variables (prefixed with `g:`),
     file basis using `ftplugin` or `autocmd`.
 For example,
 
-    the `¿argwrap_tail_comma¿` variable has
-    two variants declared as `b:argwrap_tail_comma` and `g:argwrap_tail_comma`,
+    the `¿wrapA_tail_comma¿` variable has
+    two variants declared as `b:wrapA_tail_comma` and `g:wrapA_tail_comma`,
     for buffer and  global scopes respectively.
 
-*argwrap_line_prefix*
+*wrapA_line_prefix*
     Specifies a line prefix to be added and
     removed when working with languages that require newlines to be escaped.
     Line prefix disabled (default)
@@ -62,7 +62,7 @@ For example,
             \wubble
         \)
 
-*argwrap_padded_braces*
+*wrapA_padded_braces*
     Brace padding disabled (default)
 
         [1, 2, 3]
@@ -75,7 +75,7 @@ For example,
 
     Padding can be specified for multiple brace types
 
-*argwrap_tail_comma*
+*wrapA_tail_comma*
     Specifies if any closing brace should be preceded with a comma when wrapping lines.
     Tail comma disabled (default)
 
@@ -93,7 +93,7 @@ For example,
             wubble,
         )
 
-*argwrap_tail_comma_braces*
+*wrapA_tail_comma_braces*
     Specifies which closing brace should be preceded with a comma when wrapping lines.
     Tail comma disabled (default)
 
@@ -111,7 +111,7 @@ For example,
             3,
         ]
 
-*argwrap_tail_indent_braces*
+*wrapA_tail_indent_braces*
     Specifies if the closing brace should be indented to argument depth.
     Tail indent disabled
 
@@ -129,7 +129,7 @@ For example,
             wubble
             )
 
-*argwrap_wrap_closing_brace*
+*wrapA_wrap_closing_brace*
     Brace wrapping enabled (default)
 
         Foo(
@@ -145,7 +145,7 @@ For example,
             wobble,
             wubble)
 
-*argwrap_comma_first*
+*wrapA_comma_first*
     Comma first disabled (default)
 
         Foo(
@@ -162,8 +162,8 @@ For example,
             , wubble
         )
 
-*argwrap_comma_first_indent*
-    when used in conjunction with `argwrap_comma_first`.
+*wrapA_comma_first_indent*
+    when used in conjunction with `wrapA_comma_first`.
     Comma first indent disabled (default)
 
         Foo(
@@ -180,7 +180,7 @@ For example,
             , wubble
         )
 
-*argwrap_php_smart_brace*
+*wrapA_php_smart_brace*
     Specifies if the opening brace of ¿PHP methods¿ should be wrap/unwrap as well.
     PHP smart brace disabled (default)
 
@@ -199,7 +199,7 @@ For example,
 
 
 ------------------------------------------------------------------------------------------------------------------------
-HOOKS                                                                                                      *argwrap-hooks*
+HOOKS                                                                                                      *wrapA-hooks*
 
     It is possible to hook before or after a  wrap/unwrap operation using
     autoloaded functions, the hooks are named:
@@ -210,19 +210,19 @@ HOOKS                                                                           
 
     For example to do something after any wrap
     create a function:
-            argwrap#hooks#my_hook#post_wrap(range, container, arguments)
+            wrapA#hooks#my_hook#post_wrap(range, container, arguments)
 
     It is also possible to create a hook for a specific filetype:
-            argwrap#hooks#filetype#vim#my_hook#post_wrap(range, container, arguments)
+            wrapA#hooks#filetype#vim#my_hook#post_wrap(range, container, arguments)
 
 
     Global hooks are loaded on the first time a wrap/unwrap operation is done.
     Filetype hooks however are only loaded for the current filetype.
     You can see the list of loaded hooks with:
 
-                :echo g:argwrap_global_hooks
-                :echo g:argwrap_filetype_hooks
-                :echo b:argwrap_hooks
+                :echo g:wrapA_global_hooks
+                :echo g:wrapA_filetype_hooks
+                :echo b:wrapA_hooks
 
 
     The hooks are loaded from any directory specified in the |runtimepath|.
@@ -253,7 +253,7 @@ HOOKS                                                                           
     always define them all.
     This is a template you can use to get started:
 
-        function! argwrap#hooks#my_hook#pre_wrap(range, container, arguments) abort " {{{
+        function! wrapA#hooks#my_hook#pre_wrap(range, container, arguments) abort " {{{
             " Do nothing but prevent the file to be loaded more than once
             " When calling an autoload function
                 that is not define the script that
@@ -261,26 +261,26 @@ HOOKS                                                                           
                 is sourced every time the function is called
         endfunction  " }}}
 
-        function! argwrap#hooks#my_hook#pre_unwrap(range, container, arguments) abort " {{{
+        function! wrapA#hooks#my_hook#pre_unwrap(range, container, arguments) abort " {{{
             " Do nothing but prevent the file to be loaded more than once
             " When calling an autoload function that is not define the script that
              " should contain it is sourced every time the function is called
         endfunction  " }}}
 
-        function! argwrap#hooks#my_hook#post_wrap(range, container, arguments) abort " {{{
+        function! wrapA#hooks#my_hook#post_wrap(range, container, arguments) abort " {{{
         " Do nothing but prevent the file to be loaded more than once
         " When calling an autoload function that is not define the script that
         " should contain it is sourced every time the function is called
         endfunction  " }}}
 
-        function! argwrap#hooks#my_hook#post_unwrap(range, container, arguments) abort " {{{
+        function! wrapA#hooks#my_hook#post_unwrap(range, container, arguments) abort " {{{
         " Do nothing but prevent the file to be loaded more than once
         " When calling an autoload function that is not define the script that
         " should contain it is sourced every time the function is called
         endfunction  " }}}
 
 ------------------------------------------------------------------------------------------------------------------------
-USAGE                                                                                                      *argwrap-usage*
+USAGE                                                                                                      *wrapA-usage*
 
 1.  Position the cursor inside of the scope of the parenthesis,
     brackets or curly braces you wish to wrap/unwrap (not  on top, before or after them).
