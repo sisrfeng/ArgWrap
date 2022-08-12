@@ -1,4 +1,4 @@
-fun! s:extractCursorPositionForUnwrappedArguments(range, arguments) abort " {{{
+fun! s:extractCursorPositionForUnwrappedArguments(range, arguments) abort
     let l:cursorColumn = col('.')
     let l:lineText = getline(a:range.lineStart)
     let l:position = {}
@@ -44,7 +44,7 @@ fun! s:extractCursorPositionForUnwrappedArguments(range, arguments) abort " {{{
     en
 
     return l:position
-endf " }}}
+endf
 
 fun! s:extractCursorPositionForWrappedArguments(range, arguments) abort " {{{
     let l:position = {}
@@ -125,24 +125,26 @@ fun! s:setCursorPosition(position) abort " {{{
     call setpos('.', l:curpos)
 endf  " }}}
 
-fun! wrapA#hooks#000_curpos#pre_wrap(range, container, arguments) abort " {{{
-    let a:container.cursor = s:extractCursorPositionForUnwrappedArguments(a:range, a:arguments)
-endf  " }}}
 
-fun! wrapA#hooks#000_curpos#pre_unwrap(range, container, arguments) abort " {{{
-    let a:container.cursor = s:extractCursorPositionForWrappedArguments(a:range, a:arguments)
-endf  " }}}
 
-fun! wrapA#hooks#000_curpos#post_wrap(range, container, arguments) abort " {{{
-    let l:position = s:getCursorPositionForWrappedArguments(a:range, a:container, a:arguments)
+"\ hooks
+    fun! wrapA#hooks#000_curpos#pre_wrap(range, container, arguments) abort " {{{
+        let a:container.cursor = s:extractCursorPositionForUnwrappedArguments(a:range, a:arguments)
+    endf  " }}}
 
-    call s:setCursorPosition(l:position)
-endf  " }}}
+    fun! wrapA#hooks#000_curpos#pre_unwrap(range, container, arguments) abort " {{{
+        let a:container.cursor = s:extractCursorPositionForWrappedArguments(a:range, a:arguments)
+    endf  " }}}
 
-fun! wrapA#hooks#000_curpos#post_unwrap(range, container, arguments) abort " {{{
-    let l:position = s:getCursorPositionForUnwrappedArguments(a:range, a:container, a:arguments)
+    fun! wrapA#hooks#000_curpos#post_wrap(range, container, arguments) abort " {{{
+        let l:position = s:getCursorPositionForWrappedArguments(a:range, a:container, a:arguments)
 
-    call s:setCursorPosition(l:position)
-endf  " }}}
+        call s:setCursorPosition(l:position)
+    endf  " }}}
 
-" vim: ts=2 sw=2 et fdm=marker
+    fun! wrapA#hooks#000_curpos#post_unwrap(range, container, arguments) abort " {{{
+        let l:position = s:getCursorPositionForUnwrappedArguments(a:range, a:container, a:arguments)
+
+        call s:setCursorPosition(l:position)
+    endf
+

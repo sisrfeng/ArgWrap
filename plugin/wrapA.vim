@@ -15,7 +15,7 @@ call wrapA#initCfg('comma_first_indent' , 0)
 call wrapA#initCfg('filetype_hooks'     , {})
 call wrapA#initCfg('php_smart_brace'    , 0)
 
-com!   wrapA call wrapA#toggle()
+com!   WrapArg call wrapA#toggle()
 
 nno    <silent> <Plug>(wrapAToggle)     :call wrapA#toggle() <BAR>
-                                         \silent! call repeat#set("\<Plug>(wrapAToggle)")<CR>
+                                        \silent! call repeat#set("\<Plug>(wrapAToggle)")<CR>

@@ -418,37 +418,39 @@ fun! wrapA#toggle()
     " 一行变多行
     if l:a_range.lineStart == l:a_range.lineEnd
         call wrapA#hooks#execute(
-                                    \ 'pre_wrap',
-                                    \ l:a_range,
-                                    \ l:container,
-                                    \ l:arguments,
-                                    \ )
+                    \ 'pre_wrap',
+                    \ l:a_range,
+                    \ l:container,
+                    \ l:arguments,
+                   \ )
+
         call wrapA#wrapContainer(
-                                  \ l:a_range,
-                                  \ l:container,
-                                  \ l:arguments,
-                                  \ l:wrapBrace,
-                                  \ l:tailComma,
-                                  \ l:tailCommaBraces,
-                                  \ l:tailIndentBraces,
-                                  \ l:linePrefix,
-                                  \ l:commaFirst,
-                                  \ l:commaFirstIndent,
-                                  \ )
+                    \ l:a_range,
+                    \ l:container,
+                    \ l:arguments,
+                    \ l:wrapBrace,
+                    \ l:tailComma,
+                    \ l:tailCommaBraces,
+                    \ l:tailIndentBraces,
+                    \ l:linePrefix,
+                    \ l:commaFirst,
+                    \ l:commaFirstIndent,
+                   \ )
+
         call wrapA#hooks#execute(
-                                    \ 'post_wrap',
-                                    \ l:a_range,
-                                    \ l:container,
-                                    \ l:arguments,
-                                    \ )
+                    \ 'post_wrap',
+                    \ l:a_range,
+                    \ l:container,
+                    \ l:arguments,
+                   \ )
     el  " 多变1
         call wrapA#hooks#execute('pre_unwrap', l:a_range, l:container, l:arguments)
         call wrapA#unwrapContainer(
-                                    \ l:a_range,
-                                    \ l:container,
-                                    \ l:arguments,
-                                    \ l:padded,
-                                    \ )
+                      \ l:a_range,
+                      \ l:container,
+                      \ l:arguments,
+                      \ l:padded,
+                     \ )
         call wrapA#hooks#execute('post_unwrap', l:a_range, l:container, l:arguments)
     en
 endf
