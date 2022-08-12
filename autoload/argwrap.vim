@@ -1,16 +1,21 @@
 " Copyright (c) 2014 Alex Yatskov <alex@foosoft.net>
 
-fun! argwrap#validateRange(range)
-    return len(a:range) > 0 && !(a:range.lineStart == 0 && a:range.colStart == 0 || a:range.lineEnd == 0 && a:range.colEnd == 0)
+fun! argwrap#validateRange(a_range)
+    return len(a:a_range) > 0
+      \&& !(  a:a_range.lineStart == 0
+             \&& a:a_range.colStart == 0
+             \|| a:a_range.lineEnd == 0
+             \&& a:a_range.colEnd == 0
+          \)
 endf
 
 fun! argwrap#compareRanges(range1, range2)
     let [l:buffer, line_nuM, l:col, l:offset] = getpos('.')
 
     let l:lineDiff1 = a:range1.lineStart - line_nuM
-    let l:colDiff1 = a:range1.colStart - l:col
+    let l:colDiff1  = a:range1.colStart - l:col
     let l:lineDiff2 = a:range2.lineStart - line_nuM
-    let l:colDiff2 = a:range2.colStart - l:col
+    let l:colDiff2  = a:range2.colStart - l:col
 
     if l:lineDiff1 < l:lineDiff2
         return 1
@@ -26,18 +31,42 @@ fun! argwrap#compareRanges(range1, range2)
 endf
 
 fun! argwrap#findRange(braces)
-    let l:filter = 'synIDattr(synID(line("."), col("."), 0), "name") =~? "string"'
-    let [l:lineStart, l:colStart] = searchpairpos(a:braces[0], '', a:braces[1], 'Wnb', filter)
-    let [l:lineEnd, l:colEnd] = searchpairpos(a:braces[0], '', a:braces[1], 'Wcn', filter)
-    return {'lineStart': l:lineStart, 'colStart': l:colStart, 'lineEnd': l:lineEnd, 'colEnd': l:colEnd}
+    let l:_filter =  'synIDattr(synID(line("."), col("."), 0), "name") =~? "string"'
+    let [l:lineStart, l:colStart] = searchpairpos(
+                                            \ a:braces[0],
+                                            \ '',
+                                            \ a:braces[1],
+                                            \ 'Wnb',
+                                            \ _filter,
+                                        \ )
+
+    let [l:lineEnd, l:colEnd] =     searchpairpos(
+                                            \ a:braces[0],
+                                            \ '',
+                                            \ a:braces[1],
+                                            \ 'Wnc',
+                                            \ _filter,
+                                        \ )
+
+    return {
+        \ 'lineStart' :  l:lineStart ,
+        \ 'colStart'  :  l:colStart  ,
+        \ 'lineEnd'   :  l:lineEnd   ,
+        \ 'colEnd'    :  l:colEnd    ,
+    \ }
 endf
 
 fun! argwrap#findClosestRange()
     let l:ranges = []
-    for l:braces in [['(', ')'], ['\[', '\]'], ['{', '}']]
-        let l:range = argwrap#findRange(braces)
-        if argwrap#validateRange(l:range)
-            call add(l:ranges, l:range)
+    for l:braces in [
+                  \ ['(', ')']   ,
+                  \ ['\[', '\]'] ,
+                  \ ['{', '}']   ,
+              \ ]
+
+        let l:a_range = argwrap#findRange(braces)
+        if argwrap#validateRange(l:a_range)
+            call add(l:ranges, l:a_range)
         en
     endfor
 
@@ -48,23 +77,23 @@ fun! argwrap#findClosestRange()
     en
 endf
 
-fun! argwrap#extractContainerArgText(range, linePrefix)
+fun! argwrap#extractContainerArgText(a_range, linePrefix)
     " echom "71 行 linePrefix是" a:linePrefix
     " vim里面是¿\¿
     let l:text = ''
     let l:trimPattern = printf('\m^\s*\(.\{-}\%%(%s\)\?\)\s*$', escape(a:linePrefix, '\$.*^['))
 
-    for l:lineIndex in range(a:range.lineStart, a:range.lineEnd)
+    for l:lineIndex in range(a:a_range.lineStart, a:a_range.lineEnd)
         let l:lineText = getline(l:lineIndex)
 
         let l:extractStart = 0
-        if l:lineIndex == a:range.lineStart
-            let l:extractStart = a:range.colStart
+        if l:lineIndex == a:a_range.lineStart
+            let l:extractStart = a:a_range.colStart
         en
 
         let l:extractEnd = strlen(l:lineText)
-        if l:lineIndex == a:range.lineEnd
-            let l:extractEnd = a:range.colEnd - 1
+        if l:lineIndex == a:a_range.lineEnd
+            let l:extractEnd = a:a_range.colEnd - 1
         en
 
         if l:extractStart < l:extractEnd
@@ -130,19 +159,19 @@ fun! argwrap#extractContainerArgs(text)
     return l:arguments
 endf
 
-fun! argwrap#extractContainer(range)
-    let l:textStart = getline(a:range.lineStart)
-    let l:textEnd = getline(a:range.lineEnd)
+fun! argwrap#extractContainer(a_range)
+    let l:textStart = getline(a:a_range.lineStart)
+    let l:textEnd = getline(a:a_range.lineEnd)
 
     let l:indent = matchstr(l:textStart, '\s*')
-    let l:prefix = l:textStart[strlen(l:indent) : a:range.colStart - 1]
-    let l:suffix = l:textEnd[a:range.colEnd - 1:]
+    let l:prefix = l:textStart[strlen(l:indent) : a:a_range.colStart - 1]
+    let l:suffix = l:textEnd[a:a_range.colEnd - 1:]
 
     return {'indent': l:indent, 'prefix': l:prefix, 'suffix': l:suffix}
 endf
 
 fun! argwrap#wrapContainer(
-                            \ range,
+                            \ a_range,
                             \ container,
                             \ arguments,
                             \ wrapBrace,
@@ -154,12 +183,12 @@ fun! argwrap#wrapContainer(
                             \ commaFirstIndent,
                             \ )
     let l:argCount =  len(a:arguments)
-    let line_nuM     =  a:range.lineStart
+    let line_nuM     =  a:a_range.lineStart
     let l:prefix   =  a:container.prefix[len(a:container.prefix) - 1]
 
     call setline(line_nuM, a:container.indent . a:container.prefix)
 
-    for l:index in range(l:argCount)
+    for l:index in a_range(l:argCount)
         let l:last = l:index == l:argCount - 1
         let l:first = l:index == 0
         let l:text = ''
@@ -332,7 +361,7 @@ fun! argwrap#wrapContainer(
     en
 endf
 
-fun! argwrap#unwrapContainer(range, container, arguments, padded)
+fun! argwrap#unwrapContainer(a_range, container, arguments, padded)
     let l:brace = a:container.prefix[strlen(a:container.prefix) - 1]
     if stridx(a:padded, l:brace) == -1
         let l:padding = ''
@@ -341,8 +370,8 @@ fun! argwrap#unwrapContainer(range, container, arguments, padded)
     en
 
     let l:text = a:container.indent . a:container.prefix . l:padding . join(a:arguments, ', ') . l:padding . a:container.suffix
-    call setline(a:range.lineStart, l:text)
-    exec printf('silent %d,%dd_', a:range.lineStart + 1, a:range.lineEnd)
+    call setline(a:a_range.lineStart, l:text)
+    exec printf('silent %d,%dd_', a:a_range.lineStart + 1, a:a_range.lineEnd)
 endf
 
 
@@ -355,7 +384,7 @@ endf
     endf
 
     fun! argwrap#initSetting(name, value) abort
-        let l:setting = 'g:argwrap_'.a:name
+        let l:setting = 'g:argwrap_' . a:name
 
         if !exists(l:setting)
             let {l:setting} = a:value
@@ -374,28 +403,28 @@ fun! argwrap#toggle()
     let l:commaFirst       =  argwrap#getSetting('comma_first')
     let l:commaFirstIndent =  argwrap#getSetting('comma_first_indent')
 
-    let l:range = argwrap#findClosestRange()
-    if !argwrap#validateRange(l:range)
+    let l:a_range = argwrap#findClosestRange()
+    if !argwrap#validateRange(l:a_range)
         return
     en
 
-    let l:argText   =  argwrap#extractContainerArgText(l:range, l:linePrefix)
+    let l:argText   =  argwrap#extractContainerArgText(l:a_range, l:linePrefix)
     let l:arguments =  argwrap#extractContainerArgs(l:argText)
     if len(l:arguments) == 0
         return
     en
 
-    let l:container = argwrap#extractContainer(l:range)
+    let l:container = argwrap#extractContainer(l:a_range)
     " 一行变多行
-    if l:range.lineStart == l:range.lineEnd
+    if l:a_range.lineStart == l:a_range.lineEnd
         call argwrap#hooks#execute(
                                     \ 'pre_wrap',
-                                    \ l:range,
+                                    \ l:a_range,
                                     \ l:container,
                                     \ l:arguments,
                                     \ )
         call argwrap#wrapContainer(
-                                  \ l:range,
+                                  \ l:a_range,
                                   \ l:container,
                                   \ l:arguments,
                                   \ l:wrapBrace,
@@ -408,18 +437,18 @@ fun! argwrap#toggle()
                                   \ )
         call argwrap#hooks#execute(
                                     \ 'post_wrap',
-                                    \ l:range,
+                                    \ l:a_range,
                                     \ l:container,
                                     \ l:arguments,
                                     \ )
     el  " 多变1
-        call argwrap#hooks#execute('pre_unwrap', l:range, l:container, l:arguments)
+        call argwrap#hooks#execute('pre_unwrap', l:a_range, l:container, l:arguments)
         call argwrap#unwrapContainer(
-                                    \ l:range,
+                                    \ l:a_range,
                                     \ l:container,
                                     \ l:arguments,
                                     \ l:padded,
                                     \ )
-        call argwrap#hooks#execute('post_unwrap', l:range, l:container, l:arguments)
+        call argwrap#hooks#execute('post_unwrap', l:a_range, l:container, l:arguments)
     en
 endf
