@@ -77,7 +77,7 @@ fun! wrapA#findClosestRange()
     en
 endf
 
-fun! wrapA#extractContainerArgText(a_range, linePrefix)
+fun! wrapA#get_container_arg_text(a_range, linePrefix)
     " echom "71 行 linePrefix是" a:linePrefix
     " vim里面是¿\¿
     let l:text = ''
@@ -131,7 +131,7 @@ fun! wrapA#extractContainerArgs(text)
     let l:text = substitute(a:text, '^\s*\(.\{-}\)\s*$', '\1', '')
 
     let l:stack = []
-    let l:arguments = []
+    let l:args = []
     let l:argument = ''
 
     if len(l:text) > 0
@@ -142,7 +142,7 @@ fun! wrapA#extractContainerArgs(text)
             if len(l:stack) == 0 && l:char == ','
                 let l:argument = wrapA#trimArgument(l:argument)
                 if len(l:argument) > 0
-                    call add(l:arguments, l:argument)
+                    call add(l:args, l:argument)
                 en
                 let l:argument = ''
             el
@@ -152,11 +152,11 @@ fun! wrapA#extractContainerArgs(text)
 
         let l:argument = wrapA#trimArgument(l:argument)
         if len(l:argument) > 0
-            call add(l:arguments, l:argument)
+            call add(l:args, l:argument)
         en
     en
 
-    return l:arguments
+    return l:args
 endf
 
 fun! wrapA#extractContainer(a_range)
@@ -171,19 +171,20 @@ fun! wrapA#extractContainer(a_range)
 endf
 
 fun! wrapA#wrapContainer(
-                            \ a_range,
-                            \ container,
-                            \ arguments,
-                            \ wrapBrace,
-                            \ tailComma,
-                            \ tailCommaBraces,
-                            \ tailIndentBraces,
-                            \ linePrefix,
-                            \ commaFirst,
-                            \ commaFirstIndent,
-                            \ )
-    let l:argCount =  len(a:arguments)
-    let line_nuM     =  a:a_range.lineStart
+              \ a_range,
+              \ container,
+              \ args,
+              \ wrapBrace,
+              \ tailComma,
+              \ tailCommaBraces,
+              \ tailIndentBraces,
+              \ linePrefix,
+              \ commaFirst,
+              \ commaFirstIndent,
+            \ )
+
+    let l:argCount =  len(a:args)
+    let line_nuM =  a:a_range.lineStart
     let l:prefix   =  a:container.prefix[len(a:container.prefix) - 1]
 
     call setline(line_nuM, a:container.indent . a:container.prefix)
@@ -198,12 +199,12 @@ fun! wrapA#wrapContainer(
             if !l:first
                 let l:text .= ', '
             end
-            let l:text .= a:arguments[l:index]
+            let l:text .= a:args[l:index]
         el
-            let l:text .= a:container.indent .. a:linePrefix .. a:arguments[l:index]
-            " echom "a:arguments 是: "   a:arguments
+            let l:text .= a:container.indent . a:linePrefix . a:args[l:index]
+            " echom "a:args 是: "   a:args
             " echom "l:index 是: "   l:index
-            " echom "a:arguments[l:index] 是: "   a:arguments[l:index]
+            " echom "a:args[l:index] 是: "   a:args[l:index]
             " echom "l:text 是: "   l:text
 
             if  !l:last
@@ -361,7 +362,7 @@ fun! wrapA#wrapContainer(
     en
 endf
 
-fun! wrapA#unwrapContainer(a_range, container, arguments, padded)
+fun! wrapA#unwrapContainer(a_range, container, args, padded)
     let l:brace = a:container.prefix[strlen(a:container.prefix) - 1]
     if stridx(a:padded, l:brace) == -1
         let l:padding = ''
@@ -369,7 +370,7 @@ fun! wrapA#unwrapContainer(a_range, container, arguments, padded)
         let l:padding = ' '
     en
 
-    let l:text = a:container.indent . a:container.prefix . l:padding . join(a:arguments, ', ') . l:padding . a:container.suffix
+    let l:text = a:container.indent . a:container.prefix . l:padding . join(a:args, ', ') . l:padding . a:container.suffix
     call setline(a:a_range.lineStart, l:text)
     exec printf('silent %d,%dd_', a:a_range.lineStart + 1, a:a_range.lineEnd)
 endf
@@ -404,30 +405,29 @@ fun! wrapA#toggle()
     let l:commaFirstIndent =  wrapA#getCfg('comma_first_indent')
 
     let l:a_range = wrapA#findClosestRange()
-    if !wrapA#validateRange(l:a_range)
-        return
-    en
+    if !wrapA#validateRange(l:a_range)  | return  | en
 
-    let l:argText   =  wrapA#extractContainerArgText(l:a_range, l:linePrefix)
-    let l:arguments =  wrapA#extractContainerArgs(l:argText)
-    if len(l:arguments) == 0
+    let l:argText   =  wrapA#get_container_arg_text(l:a_range, l:linePrefix)
+    let l:args =  wrapA#extractContainerArgs(l:argText)
+    if len(l:args) == 0
         return
     en
 
     let l:container = wrapA#extractContainer(l:a_range)
-    " 一行变多行
+
     if l:a_range.lineStart == l:a_range.lineEnd
+    " 一行变多行
         call wrapA#hooks#execute(
                     \ 'pre_wrap',
                     \ l:a_range,
                     \ l:container,
-                    \ l:arguments,
+                    \ l:args,
                    \ )
 
         call wrapA#wrapContainer(
                     \ l:a_range,
                     \ l:container,
-                    \ l:arguments,
+                    \ l:args,
                     \ l:wrapBrace,
                     \ l:tailComma,
                     \ l:tailCommaBraces,
@@ -441,16 +441,16 @@ fun! wrapA#toggle()
                     \ 'post_wrap',
                     \ l:a_range,
                     \ l:container,
-                    \ l:arguments,
+                    \ l:args,
                    \ )
     el  " 多变1
-        call wrapA#hooks#execute('pre_unwrap', l:a_range, l:container, l:arguments)
+        call wrapA#hooks#execute('pre_unwrap', l:a_range, l:container, l:args)
         call wrapA#unwrapContainer(
                       \ l:a_range,
                       \ l:container,
-                      \ l:arguments,
+                      \ l:args,
                       \ l:padded,
                      \ )
-        call wrapA#hooks#execute('post_unwrap', l:a_range, l:container, l:arguments)
+        call wrapA#hooks#execute('post_unwrap', l:a_range, l:container, l:args)
     en
 endf

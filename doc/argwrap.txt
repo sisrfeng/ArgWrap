@@ -1,6 +1,6 @@
 wrapA.txt
 
-Wrap and unwrap function arguments, lists, and dictionaries in Vim
+Wrap and unwrap function args, lists, and dictionaries in Vim
 
 ========================================================================================================================
 CONTENTS  *wrapA-contents*
@@ -15,7 +15,7 @@ CONTENTS  *wrapA-contents*
 ========================================================================================================================
 wrapA                                                                                                  *wrapA-wrapA*
 
-An industrial strength argument wrapping
+An industrial strength arg wrapping
 
 
 
@@ -24,7 +24,7 @@ INSTALLATION                                                                    
 
     For example, to declare a normal mode mapping, add the following command:
 
-        nmap <silent> <leader>a <Plug>(wrapAToggle)
+        nmap <silent> <leader>a <Plug>(wrapA_Toggle)
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ For example,
         ]
 
 *wrapA_tail_indent_braces*
-    Specifies if the closing brace should be indented to argument depth.
+    Specifies if the closing brace should be indented to arg depth.
     Tail indent disabled
 
         Foo(
@@ -210,10 +210,10 @@ HOOKS                                                                           
 
     For example to do something after any wrap
     create a function:
-            wrapA#hooks#my_hook#post_wrap(range, container, arguments)
+            wrapA#hooks#my_hook#post_wrap(range, container, args)
 
     It is also possible to create a hook for a specific filetype:
-            wrapA#hooks#filetype#vim#my_hook#post_wrap(range, container, arguments)
+            wrapA#hooks#filetype#vim#my_hook#post_wrap(range, container, args)
 
 
     Global hooks are loaded on the first time a wrap/unwrap operation is done.
@@ -267,19 +267,19 @@ HOOKS                                                                           
         This is a template you can use to get started:
 
 
-        fun! wrapA#hooks#my_hook#pre_wrap(range, container, arguments) abort " {{{
+        fun! wrapA#hooks#my_hook#pre_wrap(range, container, args) abort " {{{
             " echo 'hi'
         endf  " }}}
 
-        fun! wrapA#hooks#my_hook#pre_unwrap(range, container, arguments) abort " {{{
+        fun! wrapA#hooks#my_hook#pre_unwrap(range, container, args) abort " {{{
             " echo 'hi'
         endf  " }}}
 
-        fun! wrapA#hooks#my_hook#post_wrap(range, container, arguments) abort " {{{
+        fun! wrapA#hooks#my_hook#post_wrap(range, container, args) abort " {{{
             " echo 'hi'
         endf  " }}}
 
-        fun! wrapA#hooks#my_hook#post_unwrap(range, container, arguments) abort " {{{
+        fun! wrapA#hooks#my_hook#post_unwrap(range, container, args) abort " {{{
             " echo 'hi'
         endf  " }}}
 
@@ -289,7 +289,7 @@ USAGE                                                                           
 1.  Position the cursor inside of the scope of the parenthesis,
     brackets or curly braces you wish to wrap/unwrap (not  on top, before or after them).
 
-2.  Execute the keyboard binding you defined above to toggle the wrapping and unwrapping of arguments.
+2.  Execute the keyboard binding you defined above to toggle the wrapping and unwrapping of args.
 
 ------------------------------------------------------------------------------------------------------------------------
 

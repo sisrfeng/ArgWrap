@@ -43,13 +43,13 @@ Area = "projects"
 GitHub = "vim-wrapA"
 Layout = "page"
 Tags = ["wrapA", "vim", "mit license", "vimscript"]
-Description = "Wrap and unwrap function arguments, lists, and dictionaries in Vim."
+Description = "Wrap and unwrap function args, lists, and dictionaries in Vim."
 Collection = "ProjectsActive"
 +++ -->
 
 # Vim-wrapA
 
-Vim-wrapA is an industrial strength argument wrapping and unwrapping extension for the Vim text editor. It can be used
+Vim-wrapA is an industrial strength arg wrapping and unwrapping extension for the Vim text editor. It can be used
 for collapsing and expanding everything from function calls to array and dictionary definitions.  All operations are
 easily reversible and correctly preserve the indentation of the surrounding code.
 
@@ -67,7 +67,7 @@ easily reversible and correctly preserve the indentation of the surrounding code
     nnoremap <silent> <leader>a :wrapA<CR>
     ```
 3.  Position the cursor inside of the parenthesis, brackets or curly braces you wish to wrap/unwrap.
-4.  Execute the keyboard binding you defined above to toggle the wrapping and unwrapping of arguments.
+4.  Execute the keyboard binding you defined above to toggle the wrapping and unwrapping of args.
 
 ## Configuration
 
@@ -171,7 +171,7 @@ file basis using `ftplugin` or `autocmd`. For example, the `wrapA_tail_comma` va
 
 *   `wrapA_tail_indent_braces`
 
-    Specifies if the closing brace should be indented to argument depth.
+    Specifies if the closing brace should be indented to arg depth.
 
     Tail indent disabled:
 
@@ -218,7 +218,7 @@ file basis using `ftplugin` or `autocmd`. For example, the `wrapA_tail_comma` va
 
 *   `wrapA_comma_first`
 
-    Specifies if the argument comma delimiter should be placed before arguments.
+    Specifies if the arg comma delimiter should be placed before args.
 
     Comma first disabled (default):
 
@@ -242,7 +242,7 @@ file basis using `ftplugin` or `autocmd`. For example, the `wrapA_tail_comma` va
 
 *   `wrapA_comma_first_indent`
 
-    Specifies if the first argument should be indented when used in conjunction with `wrapA_comma_first`.
+    Specifies if the first arg should be indented when used in conjunction with `wrapA_comma_first`.
 
     Comma first indent disabled (default):
 

@@ -1,3 +1,5 @@
+" Copyright (c) 2014 Alex Yatskov <alex@foosoft.net>
+
 call wrapA#initCfg('line_prefix'        , '')
 call wrapA#initCfg('padded_braces'      , '')
 
@@ -16,5 +18,9 @@ call wrapA#initCfg('php_smart_brace'    , 0)
 com!   WrapArg
      \ call wrapA#toggle()
 
-" Copyright (c) 2014 Alex Yatskov <alex@foosoft.net>
+nno    <silent> <Plug>(wrapA_Toggle)     :call wrapA#toggle() <BAR>
+                                        \silent! call repeat#set("\<Plug>(wrapA_Toggle)")<CR>
+                                         "\ silent! 导致不报错
+    " PL 'https://github.com/tpope/vim-repeat'
+    "\ todo: 下载并安装
 
