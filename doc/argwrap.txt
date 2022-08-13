@@ -204,26 +204,29 @@ HOOKS                                                                           
     It is possible to hook before or after a  wrap/unwrap operation using
     autoloaded functions, the hooks are named:
         - `pre_wrap`
-        - `pre_unwrap`
         - `post_wrap`
+
+        - `pre_unwrap`
         - `post_unwrap`
 
-    For example to do something after any wrap
+    For example
+    to do something after any wrap,
     create a function:
-            wrapA#hooks#my_hook#post_wrap(range, container, args)
+            wrapA#hooks#my_hook#post_wrap(range, here, args)
 
     It is also possible to create a hook for a specific filetype:
-            wrapA#hooks#filetype#vim#my_hook#post_wrap(range, container, args)
+            wrapA#hooks#filetype#vim#my_hook#post_wrap(range, here, args)
 
 
-    Global hooks are loaded on the first time a wrap/unwrap operation is done.
+    Global hooks are loaded on the first time
+        a wrap/unwrap operation is done.
+
     Filetype hooks however are only loaded for the current filetype.
-    You can see the list of loaded hooks with:
+        You can see the list of loaded hooks with:
 
                 :echo g:wrapA_global_hooks
                 :echo g:wrapA_filetype_hooks
                 :echo b:wrapA_hooks
-
 
     The hooks are loaded from any directory specified in the |runtimepath|.
 
@@ -257,31 +260,31 @@ HOOKS                                                                           
 
 
     An important things to know when writing a new hook
-    is that
-    calling an |autoload| function which  does not exist
-        will source the file that
-        `should` contain the function ¿every time¿.
-    So even if you
-        do not need some of the hooks,
-        always define them all.
-        This is a template you can use to get started:
+        is that
+        calling an |autoload| function which  does not exist
+            will source the file that
+            `should` contain the function ¿every time¿.
+        So even if you
+            do not need some of the hooks,
+            always define them all.
+            This is a template you can use to get started:
 
 
-        fun! wrapA#hooks#my_hook#pre_wrap(range, container, args) abort " {{{
-            " echo 'hi'
-        endf  " }}}
+            fun! wrapA#hooks#my_hook#pre_wrap(range, here, args) abort " {{{
+                " echo 'hi'
+            endf  " }}}
 
-        fun! wrapA#hooks#my_hook#pre_unwrap(range, container, args) abort " {{{
-            " echo 'hi'
-        endf  " }}}
+            fun! wrapA#hooks#my_hook#pre_unwrap(range, here, args) abort " {{{
+                " echo 'hi'
+            endf  " }}}
 
-        fun! wrapA#hooks#my_hook#post_wrap(range, container, args) abort " {{{
-            " echo 'hi'
-        endf  " }}}
+            fun! wrapA#hooks#my_hook#post_wrap(range, here, args) abort " {{{
+                " echo 'hi'
+            endf  " }}}
 
-        fun! wrapA#hooks#my_hook#post_unwrap(range, container, args) abort " {{{
-            " echo 'hi'
-        endf  " }}}
+            fun! wrapA#hooks#my_hook#post_unwrap(range, here, args) abort " {{{
+                " echo 'hi'
+            endf  " }}}
 
 ------------------------------------------------------------------------------------------------------------------------
 USAGE                                                                                                      *wrapA-usage*
