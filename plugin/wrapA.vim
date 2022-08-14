@@ -19,7 +19,7 @@ com!   WrapArg
      \ call wrapA#toggle()
 
 nno    <silent> <Plug>(wrapA_Toggle)     :call wrapA#toggle() <BAR>
-                                        \silent! call repeat#set("\<Plug>(wrapA_Toggle)")<CR>
+                                        \ call repeat#set("\<Plug>(wrapA_Toggle)")<CR>
                                          "\ silent! 导致不报错
     " PL 'https://github.com/tpope/vim-repeat'
     "\ todo: 下载并安装
