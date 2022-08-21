@@ -380,15 +380,15 @@
             let l:bName = 'b:wrapA_' . a:name
             let l:gName = 'g:wrapA_' . a:name
 
-            return exists(l:bName) ? {l:bName} : {l:gName}
+            return  exists(l:bName)
+                \ ? {l:bName}
+                \ : {l:gName}
         endf
 
         fun! wrapA#initCfg(name, value) abort
             let l:setting = 'g:wrapA_' . a:name
 
-            if !exists(l:setting)
-                let {l:setting} = a:value
-            en
+            if !exists(l:setting)  | let {l:setting} = a:value  | en
         endf
 
 fun! wrapA#toggle()

@@ -30,172 +30,175 @@ INSTALLATION                                                                    
 ------------------------------------------------------------------------------------------------------------------------
 CONFIGURATION                                                                                      *wrapA-configuration*
 
-You can customize the behavior of this extension by
-setting values for any of the following optional buffer and
-global configuration variables in your `.vimrc` file.
-Buffer variables (prefixed with `b:`)
-take precedence over global variables (prefixed with `g:`),
-    making them ideal for configuring the behavior of this extension on a file by
-    file basis using `ftplugin` or `autocmd`.
-For example,
+    You can customize the behavior of this extension by
+        setting values for any of the following optional
+            buffer and
+            global configuration variables in your `.vimrc` file.
 
-    the `¿wrapA_tail_comma¿` variable has
-    two variants declared as `b:wrapA_tail_comma` and `g:wrapA_tail_comma`,
-    for buffer and  global scopes respectively.
+    Buffer variables (prefixed with `b:`)
+    take precedence over
+    global variables (prefixed with `g:`),
+        making them ideal for configuring the behavior of this extension on a file by
+        file basis using `ftplugin` or `autocmd`.
+    For example,
 
-*wrapA_line_prefix*
-    Specifies a line prefix to be added and
-    removed when working with languages that require newlines to be escaped.
-    Line prefix disabled (default)
+        the `¿wrapA_tail_comma¿` variable has
+        two variants declared as
+            `b:wrapA_tail_comma` and `g:wrapA_tail_comma`,
+        for buffer and  global scopes respectively.
 
-        Foo(
-            wibble,
-            wobble,
-            wubble
-        )
+    *wrapA_line_prefix*
 
-    Line prefix enabled for Vimscript ()
+        Line prefix disabled (default)
 
-        Foo(
-            \wibble,
-            \wobble,
-            \wubble
-        \)
-
-*wrapA_padded_braces*
-    Brace padding disabled (default)
-
-        [1, 2, 3]
-        {1, 2, 3}
-
-    Brace padding enabled for square brackets only
-
-        [ 1, 2, 3 ]
-        {1, 2, 3}
-
-    Padding can be specified for multiple brace types
-
-*wrapA_tail_comma*
-    Specifies if any closing brace should be preceded with a comma when wrapping lines.
-    Tail comma disabled (default)
-
-        Foo(
-            wibble,
-            wobble,
-            wubble
-        )
-
-    Tail comma enabled ()
-
-        Foo(
-            wibble,
-            wobble,
-            wubble,
-        )
-
-*wrapA_tail_comma_braces*
-    Specifies which closing brace should be preceded with a comma when wrapping lines.
-    Tail comma disabled (default)
-
-        Foo(
-            wibble,
-            wobble,
-            wubble
-        )
-
-    Tail comma enabled for square brackets only
-
-        [
-            1,
-            2,
-            3,
-        ]
-
-*wrapA_tail_indent_braces*
-    Specifies if the closing brace should be indented to arg depth.
-    Tail indent disabled
-
-        Foo(
-            wibble,
-            wobble,
-            wubble
-        )
-
-    Tail indent enabled for parenthesis
-
-        Foo(
-            wibble,
-            wobble,
-            wubble
+            Foo(
+                wibble,
+                wobble,
+                wubble
             )
 
-*wrapA_wrap_closing_brace*
-    Brace wrapping enabled (default)
+        Line prefix enabled for Vimscript ()
 
-        Foo(
-            wibble,
-            wobble,
-            wubble
-        )
+            Foo(
+                \wibble,
+                \wobble,
+                \wubble
+            \)
 
-    Brace wrapping disabled
+    *wrapA_padded_braces*
+        Brace padding disabled (default)
 
-        Foo(
-            wibble,
-            wobble,
-            wubble)
+            [1, 2, 3]
+            {1, 2, 3}
 
-*wrapA_comma_first*
-    Comma first disabled (default)
+        Brace padding enabled for square brackets only
 
-        Foo(
-            wibble,
-            wobble,
-            wubble
-        )
+            [ 1, 2, 3 ]
+            {1, 2, 3}
 
-    Comma first enabled ()
+        Padding can be specified for multiple brace types
 
-        Foo(
-            wibble
-            , wobble
-            , wubble
-        )
+    *wrapA_tail_comma*
+        Specifies if any closing brace should be preceded with a comma when wrapping lines.
+        Tail comma disabled (default)
 
-*wrapA_comma_first_indent*
-    when used in conjunction with `wrapA_comma_first`.
-    Comma first indent disabled (default)
+            Foo(
+                wibble,
+                wobble,
+                wubble
+            )
 
-        Foo(
-            wibble
-            , wobble
-            , wubble
-        )
+        Tail comma enabled ()
 
-    Comma first indent enabled ()
+            Foo(
+                wibble,
+                wobble,
+                wubble,
+            )
 
-        Foo(
-              wibble
-            , wobble
-            , wubble
-        )
+    *wrapA_tail_comma_braces*
+        Specifies which closing brace should be preceded with a comma when wrapping lines.
+        Tail comma disabled (default)
 
-*wrapA_php_smart_brace*
-    Specifies if the opening brace of ¿PHP methods¿ should be wrap/unwrap as well.
-    PHP smart brace disabled (default)
+            Foo(
+                wibble,
+                wobble,
+                wubble
+            )
 
-        public function foo(
-            int $x,
-            int $y
-        )
-        {
+        Tail comma enabled for square brackets only
 
-    PHP smart brace enabled
+            [
+                1,
+                2,
+                3,
+            ]
 
-        public function foo(
-            int $x,
-            int $y
-        ) {
+    *wrapA_tail_indent_braces*
+        Specifies if the closing brace should be indented to arg depth.
+        Tail indent disabled
+
+            Foo(
+                wibble,
+                wobble,
+                wubble
+            )
+
+        Tail indent enabled for parenthesis
+
+            Foo(
+                wibble,
+                wobble,
+                wubble
+                )
+
+    *wrapA_wrap_closing_brace*
+        Brace wrapping enabled (default)
+
+            Foo(
+                wibble,
+                wobble,
+                wubble
+            )
+
+        Brace wrapping disabled
+
+            Foo(
+                wibble,
+                wobble,
+                wubble)
+
+    *wrapA_comma_first*
+        Comma first disabled (default)
+
+            Foo(
+                wibble,
+                wobble,
+                wubble
+            )
+
+        Comma first enabled ()
+
+            Foo(
+                wibble
+                , wobble
+                , wubble
+            )
+
+    *wrapA_comma_first_indent*
+        when used in conjunction with `wrapA_comma_first`.
+        Comma first indent disabled (default)
+
+            Foo(
+                wibble
+                , wobble
+                , wubble
+            )
+
+        Comma first indent enabled ()
+
+            Foo(
+                wibble
+                , wobble
+                , wubble
+            )
+
+    *wrapA_php_smart_brace*
+        Specifies if the opening brace of ¿PHP methods¿ should be wrap/unwrap as well.
+        PHP smart brace disabled (default)
+
+            public function foo(
+                int $x,
+                int $y
+            )
+            {
+
+        PHP smart brace enabled
+
+            public function foo(
+                int $x,
+                int $y
+            ) {
 
 
 ------------------------------------------------------------------------------------------------------------------------
